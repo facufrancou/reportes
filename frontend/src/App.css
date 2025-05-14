@@ -44,3 +44,11 @@
 table tr td {
   background-color: #fff !important;
 }
+.fc .fc-event {
+  white-space: normal !important; /* permite que el texto se rompa en varias líneas */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.75rem; /* opcional: achicar fuente */
+  line-height: 1.2;
+  padding: 2px 4px;
+}
