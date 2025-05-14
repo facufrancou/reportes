@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import esLocale from "@fullcalendar/core/locales/es";
+
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+
 import axios from "axios";
 import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css"; // estilos base
+import "tippy.js/dist/tippy.css";
 
 interface Evento {
   id: string;
@@ -21,6 +25,15 @@ interface Evento {
 
 export default function CalendarView() {
   const [eventos, setEventos] = useState<Evento[]>([]);
+  const calendarRef = useRef<any>(null); // 👈 Referencia al calendario
+
+  const handleFechaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fecha = e.target.value;
+    if (calendarRef.current && fecha) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.changeView("timeGridDay", fecha); // 👈 cambia la vista y navega a la fecha
+    }
+  };
 
   useEffect(() => {
     axios
@@ -33,7 +46,9 @@ export default function CalendarView() {
             if (tarea.estado_tarea === "Por Hacer") {
               tareasPendientes.push({
                 id: `${tarea.tarea_id}`,
-                title: `[${ticket.titulo}] ${ticket.ubicacion} - ${tarea.categoria_tarea || "-"}: ${limpiarParrafos(tarea.tarea_titulo)}`,
+                title: `[${ticket.titulo}] ${ticket.ubicacion} - ${
+                  tarea.categoria_tarea || "-"
+                }: ${limpiarParrafos(tarea.tarea_titulo)}`,
                 start: tarea.fecha_inicio,
                 backgroundColor: getColorPorEstado(tarea.estado_tarea),
                 borderColor: "#ccc",
@@ -67,24 +82,37 @@ export default function CalendarView() {
   function getColorPorEstado(estado: string): string {
     switch (estado) {
       case "Por Hacer":
-        return "#74c0fc"; // azul claro
+        return "#74c0fc";
       case "Hecho":
-        return "#69db7c"; // verde
+        return "#69db7c";
       case "Informacion":
-        return "#ffd43b"; // amarillo
+        return "#ffd43b";
       default:
-        return "#ced4da"; // gris
+        return "#ced4da";
     }
   }
 
   return (
     <div style={{ padding: "2rem" }}>
       <h2 style={{ marginBottom: "1rem" }}>Tareas Pendientes Programadas</h2>
+
+      <div style={{ marginBottom: "1rem", textAlign: "center" }}>
+        <label style={{ marginRight: "0.5rem" }}>Ir a fecha:</label>
+        <input type="date" onChange={handleFechaChange} />
+      </div>
+
       <FullCalendar
-        plugins={[dayGridPlugin]}
+        slotEventOverlap={false}
+        locale={esLocale}
+        ref={calendarRef}
+        plugins={[dayGridPlugin, timeGridPlugin]}
         initialView="dayGridMonth"
+        headerToolbar={{
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay",
+        }}
         events={eventos}
-        height="auto"
         eventContent={(arg) => {
           const event = arg.event;
           const descripcion = event.extendedProps.descripcion;
@@ -97,6 +125,10 @@ export default function CalendarView() {
             </Tippy>
           );
         }}
+        slotMinTime="08:00:00"
+        slotMaxTime="20:00:00"
+        expandRows={true}
+        height="auto"
         eventDisplay="block"
         dayMaxEventRows={4}
       />
