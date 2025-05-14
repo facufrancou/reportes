@@ -9,7 +9,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import axios from "axios";
 import logo from "../assets/logo.png";
-
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   username: string;
@@ -45,7 +45,7 @@ const ESTADOS = [
   "En espera",
   "Resuelto",
   "Cerrado",
-  "Desconocido",
+  /* "Desconocido", */
 ];
 
 export default function ReportView({ username }: Props) {
@@ -62,22 +62,25 @@ export default function ReportView({ username }: Props) {
     []
   );
   const storedName = localStorage.getItem("username") || username;
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
       .get("https://api-reportes.netsolutionsar.com/api/tickets-tareas")
       .then((res) => setTickets(res.data))
       .catch((err) => console.error("Error al obtener datos", err));
-      registrarEvento("Ingreso al reporte web");
+    registrarEvento("Ingreso al reporte web");
   }, []);
 
   const registrarEvento = (evento: string) => {
-    axios.post("https://api-reportes.netsolutionsar.com/api/log-reporte", {
-      nombre: storedName,
-      evento
-    }).catch((err) => {
-      console.error("Error al registrar evento:", err);
-    });
+    axios
+      .post("https://api-reportes.netsolutionsar.com/api/log-reporte", {
+        nombre: storedName,
+        evento,
+      })
+      .catch((err) => {
+        console.error("Error al registrar evento:", err);
+      });
   };
 
   const cambiarOrden = (campo: keyof Ticket) => {
@@ -655,6 +658,20 @@ export default function ReportView({ username }: Props) {
       </div>
 
       <h1>SEGUIMIENTO DE GARANTÍAS</h1>
+      <button
+        onClick={() => navigate("/calendario")}
+        style={{
+          marginBottom: "1rem",
+          padding: "0.5rem 1rem",
+          backgroundColor: "#228be6",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
+      >
+        Ver calendario
+      </button>
 
       <div>
         <button onClick={descargarPDF} style={{ marginRight: "1rem" }}>
@@ -681,7 +698,13 @@ export default function ReportView({ username }: Props) {
           <thead style={{ backgroundColor: "#ddd" }}>
             <tr>
               <th>Unidad</th>
-              <th>Ubicación</th>
+              <th
+                onClick={() => cambiarOrden("ubicacion")}
+                style={{ cursor: "pointer" }}
+              >
+                Ubicación{" "}
+                {ordenCampo === "ubicacion" && (ordenAscendente ? "▲" : "▼")}
+              </th>
               <th>Prioridad</th>
               <th>Estado ticket</th>
               <th
