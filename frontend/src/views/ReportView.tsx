@@ -110,7 +110,7 @@ export default function ReportView({ username }: Props) {
     );
   };
 
-  const limpiarParrafos = (html: string): string => {
+/*   const limpiarParrafos = (html: string): string => {
     const parser = new DOMParser();
     const decoded =
       parser.parseFromString(html, "text/html").documentElement.textContent ||
@@ -119,7 +119,24 @@ export default function ReportView({ username }: Props) {
       .replace(/<\/?p>/gi, "")
       .replace(/<br\s*\/?>/gi, " ")
       .trim();
-  };
+  }; */
+
+  const limpiarParrafos = (html: string): string => {
+  // Decodificar entidades HTML sin agregar etiquetas extra
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = html;
+  const decodedHtml = textarea.value;
+
+  const parser = new DOMParser();
+  const decoded =
+    parser.parseFromString(decodedHtml, "text/html").documentElement
+      .textContent || "";
+
+  return decoded
+    .replace(/<\/?p>/gi, "")
+    .replace(/<br\s*\/?>/gi, " ")
+    .trim();
+};
 
   const getPrioridadColor = (prioridad: string): string => {
     switch (prioridad) {
@@ -279,7 +296,7 @@ export default function ReportView({ username }: Props) {
 
     const width = doc.internal.pageSize.getWidth();
     const fechaHoy = getFechaHoy();
-
+    
     // Logo
     const cargarLogoBase64 = async (): Promise<string> => {
       const response = await fetch(logo);
@@ -297,9 +314,9 @@ export default function ReportView({ username }: Props) {
 
     doc.setFontSize(18);
     doc.text("SEGUIMIENTO DE GARANTÍAS", width / 2, 45, { align: "center" });
-
+/* 
     doc.setFontSize(12);
-    doc.text("PENDIENTES", width / 2, 65, { align: "center" });
+    doc.text("PENDIENTES", width / 2, 65, { align: "center" }); */
 
     doc.setFontSize(10);
     doc.text(
@@ -495,6 +512,7 @@ export default function ReportView({ username }: Props) {
     registrarEvento("Descarga de Excel");
 
     const data: any[] = [];
+    
 
     ticketsFiltrados.forEach((ticket) => {
       if (ticket.tareas[0]?.tarea_id === -1) {
