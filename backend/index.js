@@ -72,6 +72,7 @@ app.get("/api/tickets-tareas", async (req, res) => {
         tk.content AS tarea_titulo,
         tk.begin AS fecha_inicio,
         tk.end AS fecha_fin,
+        tk.date AS fecha_creacion_tarea,
         ROUND(tk.actiontime / 60) AS duracion_min,
         CASE tk.state
           WHEN 1 THEN 'Por Hacer'
@@ -117,6 +118,7 @@ app.get("/api/tickets-tareas", async (req, res) => {
           tarea_titulo: row.tarea_titulo,
           fecha_inicio: row.fecha_inicio,
           fecha_fin: row.fecha_fin,
+          fecha_creacion: row.fecha_creacion_tarea, 
           duracion_min: row.duracion_min,
           estado_tarea: row.estado_tarea,
           categoria_tarea: row.categoria_tarea || "-",

@@ -20,6 +20,7 @@ interface Tarea {
   tarea_titulo: string;
   fecha_inicio: string;
   fecha_fin: string;
+  fecha_creacion: string;
   duracion_min: number;
   estado_tarea: string;
   categoria_tarea: string;
@@ -274,6 +275,7 @@ export default function ReportView({ username }: Props) {
               {
                 tarea_id: -1,
                 tarea_titulo: "",
+                fecha_creacion: "",
                 fecha_inicio: "",
                 duracion_min: 0,
                 estado_tarea: "",
@@ -339,6 +341,7 @@ export default function ReportView({ username }: Props) {
         "Estado tarea",
         "Categoría tarea",
         "Descripción",
+        "Fecha creación tarea",
         "Inicio tarea",
         "Fin tarea",
         "Tiempo atención",
@@ -449,6 +452,7 @@ export default function ReportView({ username }: Props) {
             tarea.estado_tarea,
             tarea.categoria_tarea,
             limpiarParrafos(tarea.tarea_titulo),
+            formatearFecha(tarea.fecha_creacion),
             formatearFecha(tarea.fecha_inicio),
             formatearFecha((tarea as any).fecha_fin || ""),
             tiempoAtencion,
@@ -505,7 +509,7 @@ export default function ReportView({ username }: Props) {
       },
     });
 
-    doc.save("reporte.pdf");
+    doc.save(`reporte ${fechaHoy}.pdf`);
   };
 
   const descargarExcel = () => {
@@ -528,6 +532,7 @@ export default function ReportView({ username }: Props) {
           Estado_tarea: "Sin tareas",
           Categoría_tarea: "",
           Descripción: "No hay tareas generadas",
+          Fecha_creación_tarea: "",
           Fecha_inicio: "",
           Fecha_fin: "",
           Tiempo_de_atención: "",
@@ -562,6 +567,7 @@ export default function ReportView({ username }: Props) {
             Estado_tarea: tarea.estado_tarea,
             Categoría_tarea: tarea.categoria_tarea,
             Descripción: limpiarParrafos(tarea.tarea_titulo),
+            Fecha_creación_tarea: formatearFecha(tarea.fecha_creacion),
             Fecha_inicio: formatearFecha(tarea.fecha_inicio),
             Fecha_fin: formatearFecha((tarea as any).fecha_fin || ""),
             Tiempo_de_atención: tiempoAtencion,
@@ -747,6 +753,7 @@ export default function ReportView({ username }: Props) {
               <th>Estado de la tarea</th>
               <th>Categoría de la tarea</th>
               <th>Descripción de la tarea</th>
+              <th>Fecha creación de la tarea</th>
               <th>Fecha inicio de la tarea</th>
               <th>Fecha fin de la tarea</th>
               <th>Tiempo de atención</th>
@@ -865,6 +872,7 @@ export default function ReportView({ username }: Props) {
                       </td>
                       <td>{tarea.categoria_tarea}</td>
                       <td>{limpiarParrafos(tarea.tarea_titulo)}</td>
+                      <td>{formatearFecha(tarea.fecha_creacion)}</td>
                       <td>{formatearFecha(tarea.fecha_inicio)}</td>
                       <td>{formatearFecha((tarea as any).fecha_fin || "")}</td>
                       {/*   <td>
