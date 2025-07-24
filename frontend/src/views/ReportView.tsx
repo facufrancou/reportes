@@ -890,14 +890,14 @@ export default function ReportView({ username }: Props) {
                       <td>
                         {(() => {
                           const fechaTicket = new Date(ticket.fecha_reporte);
-                          const fechaTarea = new Date(tarea.fecha_inicio);
+                          const fechaTarea = new Date(tarea.fecha_creacion);
                           const diffMs =
                             fechaTarea.getTime() - fechaTicket.getTime();
                           const diffDias = diffMs / (1000 * 60 * 60 * 24);
 
                           if (diffDias < 0) return "";
                           if (diffDias < 1)
-                            return `${(tarea.duracion_min / 60).toFixed(1)} h`;
+                            return `${(diffDias * 24).toFixed(1)} h`;
                           return `${diffDias.toFixed(1)} días`;
                         })()}
                       </td>
